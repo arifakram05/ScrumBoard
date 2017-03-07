@@ -18,7 +18,7 @@ angular.module('scrumApp.scrum', ['ui.router', 'scrumApp.shared'])
     var SAVE_SCRUMUPDATE_URI = 'http://127.0.0.1:8080/ScrumBoard/rest/services/scrumupdate';
 
     //test URL
-    var TEST_SCRUM_URI = "templates/scrum/scrum.json";
+    //var TEST_SCRUM_URI = "templates/scrum/scrum.json";
 
     //define all factory methods
     var factory = {
