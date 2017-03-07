@@ -1,0 +1,97 @@
+<div class="col-md-8 col-md-offset-2" ng-controller="addScrumCtrl as ctrl">
+    <md-content class="md-padding">
+        <md-toolbar class="md-primary">
+            <div class="md-toolbar-tools">
+                <h2 class="md-flex">Create Scrum</h2>
+                <div layout="row" layout-align="end" flex>
+                    <md-switch ng-model="isScrumBeingUpdated">Update</md-switch>
+                </div>
+            </div>
+        </md-toolbar>
+
+        <md-content class="md-no-momentum">
+            <div layout="column" flex="">
+                <form name="addScrumForm">
+                    <div layout="row">
+                        <md-input-container flex="50" md-no-float class="md-block" ng-if="isScrumBeingUpdated === undefined || isScrumBeingUpdated === false">
+                            <input name="scrumName" ng-model="scrum.scrumName" placeholder="Scrum Name" required>
+                            <div class="validation-messages" ng-messages="addScrumForm.scrumName.$error">
+                                <div ng-message="required">Required</div>
+                            </div>
+                        </md-input-container>
+
+                        <!--<md-input-container flex="50" md-no-float class="md-block" ng-if="isScrumBeingUpdated === true">
+                            <input name="associates" type="text" placeholder="Search Associate" ng-model="ctrl.selectedAsscForUpdate" typeahead-editable="false" uib-typeahead="user as (user.first + ' ' + user.last) for user in users | filter:$viewValue" />
+                        </md-input-container>-->
+
+
+                        <md-input-container flex="50" md-no-float class="md-block" ng-show="isScrumBeingUpdated">
+                            <label>Associate ID or Name</label>
+                            <md-select ng-model="ctrl.selectedAsscForUpdate" md-on-close="clearSearchTerm()" data-md-container-class="selectdemoSelectHeader">
+                                <md-select-header class="demo-select-header">
+                                    <input ng-model="searchTerm" ng-change="search(searchTerm)" type="search" placeholder="Search ID or Name of the assoicate..." class="demo-header-searchbox md-text">
+                                </md-select-header>
+                                <md-optgroup>
+                                    <md-option ng-value="assc" ng-repeat="assc in filteredAssociates | filter:searchTerm">{{assc.associateName}}</md-option>
+                                </md-optgroup>
+                            </md-select>
+                        </md-input-container>
+
+
+                        <md-input-container flex="5" md-no-float class="md-block">
+                        </md-input-container>
+
+                        <md-input-container flex="50" md-no-float class="md-block">
+                            <md-select name="project" ng-model="selectedProject" required placeholder="Project">
+                                <md-option ng-value="project" ng-repeat="project in projects">{{ project.projectName }}</md-option>
+                            </md-select>
+                            <!--<input type="hidden" ng-bind="scrum.projectName = selectedProject.projectName" />-->
+                            <div class="errors" ng-messages="addScrumForm.project.$error">
+                                <div ng-message="required">Required</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+                        <md-input-container flex="50" md-no-float class="md-block" ng-if="isScrumBeingUpdated === undefined || isScrumBeingUpdated === false">
+                            <md-datepicker name="startDate" ng-model="ctrl.rawStartDate" md-placeholder="Start Date" required></md-datepicker>
+                            <input type="hidden" ng-bind="scrum.startDate = ( ctrl.rawStartDate | date: 'd MMM, yyyy')" />
+                            <div class="validation-messages" ng-messages="addScrumForm.startDate.$error">
+                                <div ng-message="required">Required</div>
+                            </div>
+                        </md-input-container>
+
+                        <md-input-container flex="5" md-no-float class="md-block">
+                        </md-input-container>
+
+                        <md-input-container flex="50" md-no-float class="md-block" ng-if="isScrumBeingUpdated === undefined || isScrumBeingUpdated === false">
+                            <md-datepicker name="endDate" ng-model="ctrl.rawEndDate" md-placeholder="End Date" required></md-datepicker>
+                            <input type="hidden" ng-bind="scrum.endDate = (ctrl.rawEndDate | date: 'd MMM, yyyy')" />
+                            <div class="validation-messages" ng-messages="addScrumForm.endDate.$error">
+                                <div ng-message="required">Required</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+
+                    <br/>
+
+                    <div layout="row" layout-align="center" flex>
+                        <md-button class="md-raised md-default" ng-click="clearScrum()">Clear</md-button>
+                        <md-button class="md-raised md-primary" ng-if="isScrumBeingUpdated === undefined || isScrumBeingUpdated === false" ng-disabled="addScrumForm.$invalid" ng-click="addScrum(scrum)">Save</md-button>
+                        <md-button class="md-raised md-primary" ng-if="isScrumBeingUpdated === true" ng-disabled="!ctrl.selectedAsscForUpdate || !selectedProject || !recentScrumRecord[0]" ng-click="updateScrum(scrum, ctrl.selectedAsscForUpdate)">Update</md-button>
+                    </div>
+                </form>
+            </div>
+        </md-content>
+
+        <br/>
+
+        <div class="panel panel-info" ng-if="recentScrumRecord != null">
+            <div class="panel-heading">Showing the most recent scrum record for the project : <b>{{selectedProject.projectName}}</b></div>
+            <div class="panel-body">
+                <p>Scrum Name: <b>{{recentScrumRecord[0].scrumName}}</b></p>
+                <p>Last Scrum Start and End Date: <b>{{recentScrumRecord[0].startDate}} - {{recentScrumRecord[0].endDate}}</b></p>
+            </div>
+        </div>
+    </md-content>
+</div>

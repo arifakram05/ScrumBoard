@@ -1,0 +1,148 @@
+<div layout="column">
+    <div ng-controller="scrumCtrl as ctrl">
+        <md-content layout-padding>
+            <div layout="row">
+                <div layout="column" layout-align="start" ng-style="{'float':'left', 'width':'35%'}">
+
+                    <form name="view_sd_form">
+                        <md-calendar name="view_sd_form_rawSelectedDate" ng-model="view_sd_rawSelectedDate" required></md-calendar>
+                    </form>
+
+                    <form name="view_sd_refinedSearchForm">
+                        <div layout="column" layout-align="center" ng-if="view_sd_searchByProject">
+                            <md-input-container flex="" md-no-float class="md-block">
+                                <input name="view_sd_projectName_label" ng-model="view_sd_searchProject" placeholder="Project Name">
+                            </md-input-container>
+
+                            <md-input-container flex="">
+                                <label>Projects</label>
+                                <md-select name="view_sd_projectName_combo" ng-model="ctrl.view_sd_selectedProjectName" required>
+                                    <md-option ng-value="project" ng-repeat="project in projects | filter: view_sd_searchProject">{{ project.projectName }}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+
+                        <div layout="row" layout-align="center">
+                            <md-switch ng-model="view_sd_searchByProject" ng-disabled="isRefinedSearchEnabled" ng-click="fetchAllProjects()" flex="100">
+                                <p>Refine</p>
+                            </md-switch>
+                        </div>
+
+                        <div layout="row" ng-if="view_sd_searchByProject" layout-align="center">
+                            <md-button ng-click="view_sd_refineProjectSearch(ctrl.view_sd_selectedProjectName.projectName, view_sd_rawSelectedDate)" class="md-raised md-primary" ng-style="{'height':'20px'}">Submit</md-button>
+                        </div>
+                    </form>
+
+                </div>
+
+                <md-input-container flex="5"></md-input-container>
+
+                <!--Project details-->
+                <div ng-show="view_sd_isDataFetched" ng-style="{'width':'100%'}">
+
+                    <table ng-style="{'text-align':'left', 'margin':'0 auto', 'width':'100%'}" flex dir-paginate="project in scrumProjects | filter:view_sd_search | itemsPerPage: 1">
+
+                        <div layout="row" layout-align="center" md-no-float class="md-block" ng-style="{'margin':'0', 'padding':'0'}">
+                            <md-input-container flex="50" ng-style="{'margin':'0', 'padding':'0'}" md-no-float class="md-block">
+                                <input ng-model="view_sd_search" id="view_sd_search" placeholder="Search">
+                            </md-input-container>
+                        </div>
+
+                        <div ng-if="scrumProjects ==  null">
+                            <md-toolbar class="noScrumRecords">
+                                <div class="md-toolbar-tools" layout="row" layout-align="center center">
+                                    <h2 class="md-flex">No Scrum records present for the selected date</h2>
+                                </div>
+                            </md-toolbar>
+                        </div>
+
+
+                        <tr>
+                            <td>
+                                <p class="text-center">{{view_sd_selectedDate}}</p>
+                                <h4 class="text-center">{{project.scrumName}} :: {{project.projectName}}</h4>
+                                <p class="text-center">{{project.startDate}} - {{project.endDate}}</p>
+                                <hr/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+
+                                <div class="panel panel-default" ng-repeat="detail in project.scrumDetails | filter : view_sd_search">
+
+                                    <md-toolbar class="md-primary" layout="row" layout-align="center center" ng-style="{'background-color': getBGColor(detail.associateId)}">
+                                        <div class="md-toolbar-tools">
+                                            <h2 class="md-flex">{{detail.associateName}}</h2>
+                                            <div layout="row" layout-align="end" flex>
+                                                <md-button class="md-icon-button" ng-if="loggedInUserId === detail.associateId" ng-click="saveScrumUpdate(detail, project.projectName)">
+                                                    <md-tooltip>Save</md-tooltip>
+                                                    <img src="img/save.svg" style="width:35px;height:35px;" />
+                                                </md-button>
+                                            </div>
+                                        </div>
+                                    </md-toolbar>
+
+                                    <div class="panel-body" style="width: 100%;">
+                                        <div style="float: left;width: 33.3%">
+                                            <md-input-container md-no-float class="md-block" flex>
+                                                <label>Yesterday's Accomplishments</label>
+                                                <textarea name="yesterday" ng-readonly="loggedInUserId !== detail.associateId" ng-model="detail.yesterday" md-maxlength="150" rows="5" max-rows="5" md-select-on-focus></textarea>
+                                            </md-input-container>
+                                        </div>
+
+                                        <div style="float: left;width: 33.3%">
+                                            <md-input-container md-no-float class="md-block" flex>
+                                                <label>Today's Target</label>
+                                                <textarea name="today" ng-readonly="loggedInUserId !== detail.associateId" ng-model="detail.today" md-maxlength="150" rows="5" max-rows="5" md-select-on-focus></textarea>
+                                            </md-input-container>
+                                        </div>
+
+                                        <div style="float: left;width: 33.3%">
+                                            <md-input-container md-no-float class="md-block" flex>
+                                                <label>Roadblocks</label>
+                                                <textarea name="roadblocks" ng-readonly="loggedInUserId !== detail.associateId" ng-model="detail.roadblocks" md-maxlength="150" rows="5" max-rows="5" md-select-on-focus></textarea>
+                                            </md-input-container>
+                                        </div>
+                                        <br style="clear: left;" />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div>
+                        <div class="text-center" ng-if="scrumProjects != null">
+                            <dir-pagination-controls max-size="5" boundary-links="true" direction-links="true" template-url="js/dirPagination.tpl.html"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </md-content>
+
+        <!--Modal Begin-->
+        <div class="modal fade" id="scrum_page_modal" tabindex="-1" role="dialog" aria-labelledby="scrum_page_modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-body">
+                        <md-toolbar class="md-primary">
+                            <div class="md-toolbar-tools">
+                                <h2 class="md-flex">Scrum note details</h2>
+                            </div>
+                        </md-toolbar>
+
+                        <md-content class="md-no-momentum">
+                            <div layout="column" flex="">
+                                Modal
+                            </div>
+
+                            <div layout="row" layout-align="center" flex>
+                                <md-button class="md-raised md-default" data-dismiss="modal">close</md-button>
+                            </div>
+                        </md-content>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Modal End-->
+    </div>
+</div>

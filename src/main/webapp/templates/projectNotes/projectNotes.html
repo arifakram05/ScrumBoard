@@ -1,0 +1,128 @@
+<div layout="column" ng-cloak>
+    <div ng-controller="projectNotesCtrl as ctrl">
+        <md-content layout-padding>
+            <div layout="row">
+                <div layout="column" layout-align="start" ng-style="{'float':'left', 'width':'20%'}">
+                    <md-toolbar class="md-theme-indigo">
+                        <h1 class="md-toolbar-tools">Projects</h1>
+                    </md-toolbar>
+                    <md-content layout-padding="" ng-style="{'background-color':'#fff'}">
+                        <md-list>
+                            <md-subheader class="md-no-sticky">
+                                <input name="searchTerm" ng-model="searchTerm" placeholder="Search Projects">
+                            </md-subheader>
+                            <md-divider></md-divider>
+                            <md-list-item ng-repeat="project in projects | filter: searchTerm" ng-click="selectProject(project)" ng-class="{selected : project.projectName === selPrjToShow}">
+                                <p> {{ project.projectName }} </p>
+                                <md-divider></md-divider>
+                            </md-list-item>
+                            <md-divider></md-divider>
+                        </md-list>
+                    </md-content>
+                </div>
+
+                <md-input-container flex="1"></md-input-container>
+
+                <div layout="column" layout-align="start" ng-style="{'float':'left', 'width':'20%'}" ng-if="selectedProjectForNotes">
+                    <md-toolbar class="md-hue-3">
+                        <h1 class="md-toolbar-tools">Notes</h1>
+                    </md-toolbar>
+                    <md-content layout-padding="" ng-style="{'background-color':'#fff'}">
+                        <md-list>
+                            <!--<md-input-container flex="" ng-style="{'margin':'0', 'padding':'0'}" md-no-float class="md-block">
+                                <input ng-model="searchTermNotes" id="searchTermNotes" placeholder="Search Notes">
+                            </md-input-container>-->
+                            <md-subheader class="md-no-sticky">
+                                <input ng-model="searchTermNotes" id="searchTermNotes" placeholder="Search Notes">
+                            </md-subheader>
+                            <md-divider></md-divider>
+                            <md-list-item class="md-2-line" ng-repeat="note in allProjectNotes | filter: searchTermNotes" ng-click="showNotes(note)" ng-class="{selected : note === selNotesToShow}">
+                                <div class="md-list-item-text">
+                                    <h3> {{ note.title }} </h3>
+                                    <h6>{{note.author}} - {{note.createdOn}}</h6>
+                                </div>
+                                <md-divider></md-divider>
+                            </md-list-item>
+                            <md-divider></md-divider>
+                        </md-list>
+                    </md-content>
+                </div>
+
+                <md-input-container flex="1"></md-input-container>
+
+                <div layout="column" ng-style="{'width':'100%'}">
+                    <md-toolbar class="md-primary">
+                        <div class="md-toolbar-tools">
+                            <h2 class="md-flex" ng-if="selPrjToShow">{{selPrjToShow}}</h2>
+                            <h2 class="md-flex" ng-if="!selPrjToShow">Select a Project</h2>
+                            <div layout="row" layout-align="end" flex>
+
+                                <div ng-if="isUserCreatingNewNote === false && allProjectNotes && canShowButtonsFn(selPrjToShow)">
+                                    <md-button class="md-fab md-mini" ng-style="{'background-color':'#fff'}" ng-click="addNewNotes()" aria-label="new">
+                                        <md-icon md-svg-src="img/new.svg"></md-icon>
+                                        <md-tooltip>New Notes</md-tooltip>
+                                    </md-button>
+                                </div>
+
+                                <div ng-if="isUserCreatingNewNote === true && isNotesBeingUpdated === false">
+                                    <md-button class="md-fab md-mini" ng-style="{'background-color':'#fff'}" ng-click="saveNewNote(ctrl.newProjectNoteContent, ctrl.newProjectNoteTitle)" aria-label="save">
+                                        <md-icon md-svg-src="img/save.svg"></md-icon>
+                                        <md-tooltip>Save</md-tooltip>
+                                    </md-button>
+                                </div>
+
+                                <div ng-if="isUserCreatingNewNote">
+                                    <md-button class="md-fab md-mini" ng-style="{'background-color':'#fff'}" ng-click="cancelNewNote()" aria-label="cancel">
+                                        <md-icon md-svg-src="img/cancel.svg"></md-icon>
+                                        <md-tooltip>Cancel</md-tooltip>
+                                    </md-button>
+                                </div>
+
+                                <div ng-if="isNotesBeingUpdated">
+                                    <md-button class="md-fab md-mini" ng-style="{'background-color':'#fff'}" ng-click="updateNotes(projNotesToUpdate)" aria-label="update">
+                                        <md-icon md-svg-src="img/update.svg"></md-icon>
+                                        <md-tooltip>Update Notes</md-tooltip>
+                                    </md-button>
+                                </div>
+                                <div ng-if="canShowEditButton && canShowButtonsFn(selPrjToShow) && isUserCreatingNewNote === false">
+                                    <md-button class="md-fab md-mini" ng-style="{'background-color':'#fff'}" ng-click="editNotes(selNotesToShow)" aria-label="edit">
+                                        <md-icon md-svg-src="img/edit.svg"></md-icon>
+                                        <md-tooltip>Edit Notes</md-tooltip>
+                                    </md-button>
+                                </div>
+                                <div ng-if="canShowDeleteButton && canShowButtonsFn(selPrjToShow) && isUserCreatingNewNote === false">
+                                    <md-button class="md-fab md-mini" ng-style="{'background-color':'#fff'}" ng-click="deleteNotes(selNotesToShow)" aria-label="delete">
+                                        <md-icon md-svg-src="img/delete.svg"></md-icon>
+                                        <md-tooltip>Delete Notes</md-tooltip>
+                                    </md-button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </md-toolbar>
+
+                    <div ng-style="{'width':'100%'}">
+
+                        <!--Selected Project Note Details-->
+                        <div layout="column" class="projectNotesDisplayArea" ng-if="isUserCreatingNewNote === false">
+                            <h3 ng-style="{'text-align':'center'}">{{noteTitle}}</h3>
+                            <br/>
+                            <div ng-bind-html="detailedProjectNote">
+                            </div>
+                        </div>
+
+                        <!--New Project Note Creation-->
+                        <div layout="column" ng-if="isUserCreatingNewNote === true" class="projectNotesDisplayArea">
+                            <div ng-style="{'margin-bottom':'10px'}">
+                                <input name="noteTitle" class="form-control" ng-model="ctrl.newProjectNoteTitle" placeholder="Name or short description for your notes" required>
+                            </div>
+                            <div class="text-editor-panel" text-angular="text-angular" name="ctrl.newProjectNoteContent" ng-model="ctrl.newProjectNoteContent"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </md-content>
+    </div>
+</div>

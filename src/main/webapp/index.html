@@ -1,0 +1,122 @@
+<html ng-app="scrumApp">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ScurmBoard</title>
+
+    <!--Bootstrap-->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen" />
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet" media="screen" />
+    <!-- Angular Material style sheet -->
+    <link rel="stylesheet" href="css/angular-material.min.css">
+    <!--Angular growl 2-->
+    <link rel="stylesheet" media="screen" href="css/angular-growl.min.css">
+    <!--font awesome-->
+    <link data-require="font-awesome@*" data-semver="4.3.0" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+    <!--google fonts-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Text Angular-->
+    <link rel='stylesheet' href='css/textAngular.css'>
+    <!--Application CSS-->
+    <link href="css/app.css" rel="stylesheet" media="screen" />
+</head>
+
+<body ng-controller="mainCtrl">
+    <!-- Navigation Bar -->
+    <md-toolbar ng-style="{'background-color':'darkcyan', 'padding-right':'32px', 'padding-left':'32px'}" class="navbar-fixed-top">
+        <div class="md-toolbar-tools">
+
+            <div class="navbar-header">
+                <img ui-sref="scrum" src="img/logo.png" height="40px" width="40px" class="hand" />&nbsp;&nbsp;<span ui-sref="scrum" class="hand">ScrumBoard</span>
+            </div>
+
+            <div flex layout="row" layout-align="center center">
+                <span><b>{{userDetails.associateName}}</b></span>
+            </div>
+
+            <md-button class="md-icon-button" style="border-radius:0%  !important" ng-if=' isUserLoggedIn && userRole === "admin" ' ng-click="showProjectModal()">
+                <md-tooltip>Add Project</md-tooltip>
+                <img src="img/addProject.png" style="width:35px;height:35px;" />
+            </md-button>
+            <md-button class="md-icon-button" ng-if=' isUserLoggedIn && (userRole === "admin" || userRole === "lead")' ui-sref="addAssociate">
+                <md-tooltip>Add Associate</md-tooltip>
+                <img src="img/addAssociate.png" style="width:35px;height:35px;" />
+            </md-button>
+            <md-button class="md-icon-button" ng-if='isUserLoggedIn' ui-sref="projectNotes">
+                <md-tooltip>Project Notes</md-tooltip>
+                <img src="img/notes.png" style="width:35px;height:35px;" />
+            </md-button>
+            <md-button class="md-icon-button" ng-if=' isUserLoggedIn && userRole === "admin" ' ui-sref="addscrum">
+                <md-tooltip>Add Scrum</md-tooltip>
+                <img src="img/scrum.png" style="width:35px;height:35px;" />
+            </md-button>
+            <md-button class="md-icon-button" ng-if='isUserLoggedIn' ng-click="showUserInfo()">
+                <md-tooltip>My Info</md-tooltip>
+                <img src="img/userDetails.png" style="width:35px;height:35px;" />
+            </md-button>
+            <md-button class="md-icon-button" ng-if='isUserLoggedIn === false' ui-sref="login">
+                <md-tooltip>Login</md-tooltip>
+                <img src="img/login.png" style="width:35px;height:35px;" />
+            </md-button>
+            <md-button class="md-icon-button" ng-if='isUserLoggedIn === true' ui-sref="logout">
+                <md-tooltip>Logout</md-tooltip>
+                <img src="img/logout.png" style="width:35px;height:35px;" />
+            </md-button>
+
+        </div>
+    </md-toolbar>
+
+    <div class="mainContent">
+        <div growl></div>
+        <!--User Notifications-->
+        <div ui-view>
+        </div>
+    </div>
+
+    <script src="lib/jquery.js"></script>
+    <script src="lib/bootstrap.min.js"></script>
+    <script src="lib/angular.min.js"></script>
+    <script src="lib/ui-bootstrap-tpls.min.js"></script>
+    <script src="lib/angular-ui-router.min.js"></script>
+    <script src="lib/angular-animate.min.js"></script>
+    <script src="lib/angular-aria.min.js"></script>
+    <script src="lib/angular-messages.min.js"></script>
+    <!-- Angular Material Library -->
+    <script src="lib/angular-material.min.js"></script>
+    <!--Angular Growl-->
+    <script src="lib/angular-growl.min.js"></script>
+    <!--TextAngular-->
+    <script src='lib/textangular/textAngular-rangy.min.js'></script>
+    <script src='lib/textangular/textAngular-sanitize.min.js'></script>
+    <script src='lib/textangular/textAngular.min.js'></script>
+    <!--Utilities-->
+    <script src="js/dirPagination.js"></script>
+
+    <!--Application js files-->
+    <script src="js/app.js"></script>
+    <script src="js/sharedapp.js"></script>
+    <script src="templates/login/login.js"></script>
+    <script src="templates/logout/logout.js"></script>
+    <script src="templates/scrum/scrum.js"></script>
+    <script src="templates/scrum/addscrum.js"></script>
+    <script src="templates/project/project.js"></script>
+    <script src="templates/associate/associate.js"></script>
+    <script src="templates/associate/userDetails.js"></script>
+    <script src="templates/projectNotes/projectNotes.js"></script>
+
+</body>
+
+<footer>
+    <div ng-style="{'background-color':'black', 'color':'white', 'padding-right':'32px', 'padding-left':'32px'}">
+        <div class="md-toolbar-tools">
+            <div flex layout="column" layout-align="center center">
+                <span ng-style="{'font-size':'10px'}">Version: 1.0</span>
+                <span ng-style="{'font-size':'10px'}">Developer: Arif Akram</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</html>
