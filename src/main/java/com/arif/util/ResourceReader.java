@@ -46,6 +46,7 @@ public class ResourceReader {
 			projectProperties.put("dbUser", prop.getProperty("dbUser"));
 			projectProperties.put("dbPassword", prop.getProperty("dbPassword"));
 			projectProperties.put("dbName", prop.getProperty("dbName"));
+			projectProperties.put("jira", prop.getProperty("jira"));
 
 		} catch (IOException exception) {
 			exception.printStackTrace();

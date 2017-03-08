@@ -7,6 +7,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -17,6 +18,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 
 import com.arif.interfaces.ScrumBoard;
 import com.arif.model.Associate;
+import com.arif.model.Jira;
 import com.arif.model.Project;
 import com.arif.model.ProjectNotes;
 import com.arif.model.Scrum;
@@ -348,6 +350,17 @@ public class ScrumBoardServices {
 
 		ScrumBoardResponse<Void> response = ScrumBoard.getInstance().updateScrum(scrumDetails, associateDetails,
 				associateId, token);
+		return response;
+	}
+
+	@GET
+	@Path("/jira/{associateId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public ScrumBoardResponse<Jira> getJiraIssues(@PathParam("associateId") String associateId,
+			@QueryParam("maxResults") int maxResults, @QueryParam("status") String status,
+			@QueryParam("user") String userId, @HeaderParam("Authorization") String token) {
+		ScrumBoardResponse<Jira> response = ScrumBoard.getInstance().getJiraIssues(associateId, maxResults, status, userId,
+				token);
 		return response;
 	}
 

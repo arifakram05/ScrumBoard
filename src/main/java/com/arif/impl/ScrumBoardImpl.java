@@ -8,6 +8,7 @@ import org.codehaus.jackson.map.type.TypeFactory;
 
 import com.arif.interfaces.ScrumBoard;
 import com.arif.model.Associate;
+import com.arif.model.Jira;
 import com.arif.model.Project;
 import com.arif.model.ProjectNotes;
 import com.arif.model.Scrum;
@@ -493,6 +494,36 @@ public class ScrumBoardImpl implements ScrumBoard {
 			LOGGER.error("Error while fetching associates per search criteria", e);
 			response.setCode(500);
 			response.setMessage("Error occurred. Could not retrieve associates per your search criteria");
+		}
+		return response;
+	}
+
+	@Override
+	public ScrumBoardResponse<Jira> getJiraIssues(String associateId, int maxResults, String status, String userId, String token) {
+		ScrumBoardResponse<Jira> response = new ScrumBoardResponse<>();
+		List<Jira> JiraList = null;
+		try {
+			// validate token
+			if (validateToken(token, userId)) {
+				LOGGER.info("Token is valid for associate " + userId + ". Proceeding ahead with processing request");
+				LOGGER.info("Preparing to fetch all JIRA issues on " + associateId);
+				JiraList = getJiraServiceInstance().getJiraIssues(associateId, maxResults, status);
+				LOGGER.info("All JIRAs retrieved");
+				response.setCode(200);
+				response.setMessage("List of all Jiras");
+				response.setResponse(JiraList);
+			} else {
+				// as token is invalid, do not process the request
+				LOGGER.info(
+						"Token is not valid for associate " + associateId + ". Cannot proceed ahead with the request");
+				response.setCode(403);
+				response.setMessage(
+						"System cannot proceed with your operation for security reasons. Please re-login and perform the operation again");
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error while fetching Jiras ", e);
+			response.setCode(500);
+			response.setMessage("Error occurred. Could not get Jira list");
 		}
 		return response;
 	}

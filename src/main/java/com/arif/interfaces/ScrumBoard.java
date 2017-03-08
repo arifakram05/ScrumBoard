@@ -1,12 +1,14 @@
 package com.arif.interfaces;
 
 import com.arif.impl.AssociateServiceImpl;
+import com.arif.impl.JiraServiceImpl;
 import com.arif.impl.LoginServiceImpl;
 import com.arif.impl.ProjectNotesServiceImpl;
 import com.arif.impl.ProjectServiceImpl;
 import com.arif.impl.ScrumBoardImpl;
 import com.arif.impl.ScrumServiceImpl;
 import com.arif.model.Associate;
+import com.arif.model.Jira;
 import com.arif.model.Project;
 import com.arif.model.ProjectNotes;
 import com.arif.model.Scrum;
@@ -220,6 +222,24 @@ public interface ScrumBoard extends DBConnection {
 			String token);
 
 	/**
+	 * get JIRAs assigned to the given associate
+	 * 
+	 * @param associateId
+	 *            associate whose jira details to fetch
+	 * @param maxResults
+	 *            max records to fetch
+	 * @param status
+	 *            jira status
+	 * @param userId
+	 *            user who is performing this operation
+	 * @param token
+	 *            user's JWT token
+	 * @return a {@link ScrumBoardResponse} containing operation status
+	 */
+	ScrumBoardResponse<Jira> getJiraIssues(String associateId, int maxResults, String status, String userId,
+			String token);
+
+	/**
 	 * Java 8 feature.<br/>
 	 * Get an object of the implementations class
 	 * 
@@ -254,4 +274,7 @@ public interface ScrumBoard extends DBConnection {
 		return new ProjectNotesServiceImpl(getDBConnection());
 	}
 
+	default JiraServiceImpl getJiraServiceInstance() {
+		return new JiraServiceImpl();
+	}
 }

@@ -11,7 +11,7 @@ angular.module('scrumApp.login', ['ui.router', 'scrumApp.shared'])
 
 .factory('loginService', ['$http', '$q', function ($http, $q) {
 
-    var LOGIN_ASSOCIATE_URI = 'http://127.0.0.1:8080/ScrumBoard/rest/services/login/';
+    var LOGIN_ASSOCIATE_URI = constants.url+'login/';
 
     var factory = {
         loginAssociate: loginAssociate

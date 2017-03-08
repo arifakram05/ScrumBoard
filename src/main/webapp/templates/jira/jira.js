@@ -13,8 +13,8 @@ angular.module('scrumApp.jira', ['ui.router'])
 
 .factory('jiraService', ['$http', '$q', function ($http, $q) {
 
-    //var JIRA_URI = 'http://127.0.0.1:8080/ScrumBoard/rest/services/jira/';
-    var TEST_JIRA_URI = "templates/jira/jira.json";
+    var JIRA_URI = constants.url+'jira/';
+    //var TEST_JIRA_URI = "templates/jira/jira.json";
 
     //define all factory methods
     var factory = {
@@ -23,12 +23,19 @@ angular.module('scrumApp.jira', ['ui.router'])
 
     return factory;
 
-    function getJiraDetails(jira, associateId) {
-        console.log('Retrieving JIRA details for : ', jira, ' ', associateId);
+    function getJiraDetails(jira, userId) {
+        JIRA_URI = constants.url+'jira/' + jira.associateId;
+        console.log('Retrieving JIRA details for : ', jira, ' ', userId);
         var deferred = $q.defer();
         $http({
                 method: 'GET',
-                url: TEST_JIRA_URI
+                //url: TEST_JIRA_URI
+                url: JIRA_URI,
+                params : {
+                    maxResults: jira.maxResults,
+                    status: jira.status,
+                    user: userId
+                }
             })
             .then(
                 function success(response) {
@@ -47,6 +54,8 @@ angular.module('scrumApp.jira', ['ui.router'])
 
 .controller('jiraCtrl', ['$scope', '$filter', '$q', 'SharedService', 'jiraService', '$mdDialog', function ($scope, $filter, $q, SharedService, jiraService, $mdDialog) {
 
+    var associateId = SharedService.getAssociateId();
+
     console.log('inside jira controller');
 
     $scope.jiraURL = 'https://jira2.cerner.com/browse/';
@@ -55,10 +64,10 @@ angular.module('scrumApp.jira', ['ui.router'])
         console.log('jira details to fetch : ', jira);
 
         //URI POST call to save the scrum
-        var promise = jiraService.getJiraDetails(jira, $scope.loggedInUserId);
+        var promise = jiraService.getJiraDetails(jira, associateId);
         promise.then(function (result) {
-                console.log('JIRA details retrieved :', result);
-                $scope.jiraDetails = result;
+                console.log('JIRA details retrieved :', result.response);
+                $scope.jiraDetails = result.response;
             })
             .catch(function (resError) {
                 console.log('Failed to retrieve JIRA details :: ', resError);
