@@ -19,13 +19,19 @@ public class JiraServiceImpl {
 
 	private final static Client CLIENT = Client.create();
 	private final static Logger LOGGER = Logger.getLogger(ScrumBoardImpl.class);
-	private final static String URL = ResourceReader.projectProperties.get("jira");
-	//private final static String URL = "https://jira2.cerner.com/rest/api/2/search?jql=assignee=am046752&maxResults=2&fields=summary,description,creator,created,issueType,priority,project,status,reporter";
+	private final static String JIRA_URL = ResourceReader.projectProperties.get("jira");
+	private final static String JIRA_ALLRESULTS_URL = ResourceReader.projectProperties.get("jiraAllResults");
 
 	public List<Jira> getJiraIssues(String associateId, int maxResults, String status) {
 		List<Jira> jiraList = new ArrayList<>();
-		
-		String processedURL = formatURL(URL, associateId, maxResults);
+		String processedURL;
+
+		if(status == null || (status != null && status.equalsIgnoreCase("all"))) {
+			processedURL = formatURLForLimitedResults(JIRA_URL, associateId, maxResults);
+		} else {
+			processedURL = formatURLForAllResults(JIRA_ALLRESULTS_URL, associateId);
+		}
+
 		WebResource webResource = CLIENT.resource(processedURL);
 		ClientResponse response = webResource.accept(Constants.MEDIATYPE.getValue()).get(ClientResponse.class);
 
@@ -37,17 +43,22 @@ public class JiraServiceImpl {
 		LOGGER.debug("Response JSON from JIRA :" + jiraResponse);
 		
 		try {
-			processJson(jiraResponse, jiraList);
+			processJson(jiraResponse, jiraList, status);
 		} catch (Exception e) {
 			LOGGER.error("Error occurred while processing results from JIRA ",e);
 		}
 		return jiraList;
 	}
 
-	private String formatURL(String URL, String associateId, int maxResults) {
+	private String formatURLForLimitedResults(String URL, String associateId, int maxResults) {
 		return MessageFormat.format(URL, new Object[] { associateId, maxResults});
 	}
-	private void processJson(String json, List<Jira> jiraList) throws Exception {
+
+	private String formatURLForAllResults(String URL, String associateId) {
+		return MessageFormat.format(URL, new Object[] { associateId});
+	}
+
+	private void processJson(String json, List<Jira> jiraList, String givenStatus) throws Exception {
 		JSONObject jsonObject = new JSONObject(json);
 		if (jsonObject != null) {
 			JSONArray issuesArray = jsonObject.getJSONArray("issues");
@@ -64,9 +75,14 @@ public class JiraServiceImpl {
 				jira.setCreator(issuesObject.optJSONObject("fields").optJSONObject("creator").opt("displayName").toString());
 				jira.setReporter(issuesObject.optJSONObject("fields").optJSONObject("reporter").opt("displayName").toString());
 				jira.setPriority(issuesObject.optJSONObject("fields").optJSONObject("priority").opt("name").toString());
-				jira.setStatus(issuesObject.optJSONObject("fields").optJSONObject("status").opt("name").toString());
+				String jiraStatus = issuesObject.optJSONObject("fields").optJSONObject("status").opt("name").toString();
+				jira.setStatus(jiraStatus);
 
-				jiraList.add(jira);
+				if(givenStatus == null || (givenStatus != null && givenStatus.equalsIgnoreCase("all"))) {
+					jiraList.add(jira);
+				} else if(givenStatus.equalsIgnoreCase(jiraStatus)) {
+					jiraList.add(jira);
+				}
 			}
 		}
 	}

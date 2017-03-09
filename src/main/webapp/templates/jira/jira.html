@@ -24,7 +24,7 @@
 
                                     <md-input-container flex="5"></md-input-container>
 
-                                    <md-input-container flex="50" md-no-float class="md-block" ng-style="{'height':'20px'}">
+                                    <md-input-container flex="50" ng-if="isJIRAStatusSel === undefined || isJIRAStatusSel === 'All' " md-no-float class="md-block" ng-style="{'height':'20px'}">
                                         <label>Max Results</label>
                                         <input name="maxResults" ng-model="jira.maxResults" placeholder="10">
                                     </md-input-container>
@@ -32,12 +32,8 @@
                                     <md-input-container flex="5"></md-input-container>
 
                                     <md-input-container flex="50" md-no-float class="md-block" ng-style="{'height':'20px'}">
-                                        <md-select name="status" ng-model="jira.status" placeholder="Status">
-                                            <md-option value="any">Any</md-option>
-                                            <md-option value="open">Open</md-option>
-                                            <md-option value="submitted">Submitted</md-option>
-                                            <md-option value="in progress">In Progress</md-option>
-                                            <md-option value="closed">Closed</md-option>
+                                        <md-select name="status" ng-model="jira.status" ng-change="jiraStatusChange(jira.status)" placeholder="Status">
+                                            <md-option value="{{jStatus}}" ng-repeat="jStatus in jiraStatuses">{{ jStatus }}</md-option>
                                         </md-select>
                                     </md-input-container>
 
@@ -50,7 +46,7 @@
 
                                     <md-input-container flex="5"></md-input-container>
 
-                                    <md-button class="md-raised md-primary" ng-click="findJiras(jira)" ng-style="{'height':'20px'}">Submit</md-button>
+                                    <md-button class="md-raised md-primary" ng-disabled="canShowSubmitButton(jira) == false" ng-click="findJiras(jira)" ng-style="{'height':'20px'}">Submit</md-button>
                                 </div>
 
                             </form>
@@ -63,10 +59,15 @@
                                         <md-content layout-padding="" ng-style="{'background-color':'#fff'}">
                                             <md-toolbar ng-style="{'background-color': 'seagreen', 'height':'10px'}">
                                                 <div class="md-toolbar-tools" layout="row">
-                                                    <h4>{{jiraD.key}}</h4>
+                                                    <h4><a target="_blank" ng-href="{{jiraURL}}{{jiraD.key}}">{{jiraD.key}}</a></h4>
                                                     <div layout="row" layout-align="end" flex>
-									                    {{jiraD.status}}
-									                </div>
+                                                        {{jiraD.status}}
+                                                    </div>
+                                                    <!--<div layout="row" layout-align="end" flex>
+                                                        <a class="btn btn-primary" aria-label="view details">
+                                                            <i class="fa fa-binoculars" aria-hidden="true"></i>
+                                                        </a>
+                                                    </div>-->
                                                 </div>
                                             </md-toolbar>
 
@@ -146,4 +147,30 @@
             </div>
         </div>
     </md-content>
+
+    <!--Future : To display JIRA details in a modal-->
+    <!--<div class="modal fade" id="jira_modal" tabindex="-1" role="dialog" aria-labelledby="jira_modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <md-toolbar class="md-primary">
+                        <div class="md-toolbar-tools">
+                            <h2 class="md-flex">Jira details</h2>
+                        </div>
+                    </md-toolbar>
+
+                    <md-content class="md-no-momentum">
+                        <div layout="column" flex="">
+                            Modal
+                        </div>
+
+                        <div layout="row" layout-align="center" flex>
+                            <md-button class="md-raised md-default" data-dismiss="modal">close</md-button>
+                        </div>
+                    </md-content>
+                </div>
+            </div>
+        </div>
+    </div>-->
 </div>

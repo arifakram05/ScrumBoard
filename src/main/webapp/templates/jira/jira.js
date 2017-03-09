@@ -56,12 +56,40 @@ angular.module('scrumApp.jira', ['ui.router'])
 
     var associateId = SharedService.getAssociateId();
 
+    $scope.jira = {
+
+    };
+
     console.log('inside jira controller');
 
     $scope.jiraURL = 'https://jira2.cerner.com/browse/';
 
+    $scope.jiraStatuses = ['All','Open', 'Closed', 'In Progress', 'Engineering Complete', 'Submitted', 'In Review', 'Verified', 'Blocked', 'Reopened',
+                         'Investigation', 'Approved', 'Missed', 'Failed in Testing', 'In Code Review',  'Released', 'Deployed',
+                         'Waiting for Client Input', 'Scheduled', 'Resolved', 'On Hold',  'Pending Approval', 'Pending Agreement',
+                         'Pending Client Action', 'Pending Final Review',
+                        ];
+
+    $scope.canShowSubmitButton = function (jira) {
+        if (jira.associateId) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    $scope.jiraStatusChange = function(jiraStatus) {
+        $scope.isJIRAStatusSel = jiraStatus;
+    }
+
     $scope.findJiras = function (jira) {
         console.log('jira details to fetch : ', jira);
+        if(jira.maxResults === undefined || jira.maxResults === "") {
+            jira.maxResults = 5;
+        }
+        if(jira.status === undefined) {
+            jira.status = 'All';
+        }
 
         //URI POST call to save the scrum
         var promise = jiraService.getJiraDetails(jira, associateId);
